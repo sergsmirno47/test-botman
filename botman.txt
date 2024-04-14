@@ -1,0 +1,124 @@
+https://www.youtube.com/watch?v=DaxI9WkpTBI
+
+Laravel 10 Chatbot.txt
+
+Laravel 10 Botman Chatbot
+
+Step # 1 : Create Fresh Laravel Project or Use an exisiting laravel project
+Global Command : laravel new botman
+Non Global Command : composer create-project laravel/laravel --prefer-dist botman
+
+Step # 2 : Install Botman
+Command : 
+composer require botman/botman
+composer require botman/driver-telegram
+
+Step # 3 : Install Botman driver
+Command : composer require botman/driver-web
+
+Step # 4 : Configure cache in Config/botman/config.php
+<?php
+
+return [
+    'conversation_cache_time' => 40,
+    'user_cache_time' => 30,
+];
+?>
+
+Step # 5 : Configure driver in Config/botman/web.php
+<?php
+
+return [
+    
+    'matchingData' => [
+        'driver' => 'web',
+    ],
+];
+
+Step # 6 : Create Controller
+Command : php artisan make:controller BotManController
+
+Step # 7 : Create a route
+use App\Http\Controllers\BotManController;
+
+Route::match(['get', 'post'], '/botman', 'App\Http\Controllers\BotManController@handle');
+
+Step # 8 : Replace the Welcome blade html.
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Laravel 10 - Botman Chatbot</title>
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
+    </head>
+    <body>
+    </body>
+   
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/assets/css/chat.min.css">
+    <script>
+        var botmanWidget = {
+            aboutText: 'Start the conversation with Hi',
+            introMessage: "WELCOME TO ALL ABOUT LARAVEL"
+        };
+    </script>
+   
+    <script src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js'></script>
+       
+</html> 
+
+Step # 9 : Paste the below code in BotManController
+
+<?php
+namespace App\Http\Controllers;
+   
+use BotMan\BotMan\BotMan;
+use Illuminate\Http\Request;
+use BotMan\BotMan\Messages\Incoming\Answer;
+   
+class BotManController extends Controller
+{
+    /**
+     * Place your BotMan logic here.
+     */
+    public function handle()
+    {
+        $botman = app('botman');
+   
+        $botman->hears('{message}', function($botman, $message) {
+   
+            if ($message == 'hi') {
+                $this->askName($botman);
+            }
+            
+            else{
+                $botman->reply("Start a conversation by saying hi.");
+            }
+   
+        });
+   
+        $botman->listen();
+    }
+   
+    /**
+     * Place your BotMan logic here.
+     */
+    public function askName($botman)
+    {
+        $botman->ask('Hello! What is your Name?', function(Answer $answer) {
+   
+            $name = $answer->getText();
+   
+            $this->say('Nice to meet you '.$name);
+        });
+    }
+}
+
+
+usefull LINKS
+https://www.youtube.com/watch?v=d8Ao5ZlEl8o&t=272s
+https://serhii.io/posts/telegram-bot-with-botman-and-latest-laravel-version
+
+отключить проверку CSRF-токенов в Laravel
+https://www.dev-notes.ru/articles/laravel/how-to-fix-419-page-expired-csrf-token-mismatch/  
